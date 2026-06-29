@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // SPA redirect for GitHub Pages: converts path to hash route
+    var path = window.location.pathname;
+    var repo = '/eou-version-comparison';
+    // Strip repo prefix if present
+    if (path.indexOf(repo) === 0) {
+      path = path.slice(repo.length);
+    }
+    var hash = '#' + (path || '/');
+    window.location.replace(repo + '/' + hash + window.location.search);
+  </script>
+</head>
+<body></body>
+</html>
