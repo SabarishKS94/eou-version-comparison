@@ -261,7 +261,14 @@ export default class CompareVersions extends LightningElement {
         if (!active) {
             return `${best.short} has the highest overall score (${best.score}) among the selected versions. Consider activating it.`;
         }
-        return `Your active version (${active.short}) has the best overall score (${active.score}) among the selected versions.`;
+        return `${active.short} is already active and remains the top-scoring version among your selection.`;
+    }
+
+    get showActivateCta() {
+        const versions = this.selectedVersions;
+        const best = versions.reduce((a, b) => a.score > b.score ? a : b);
+        const active = versions.find(v => v.meta === 'Active');
+        return !active || active.short !== best.short;
     }
 
     _buildCell(val, bold, highlight, key) {

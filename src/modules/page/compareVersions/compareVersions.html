@@ -442,12 +442,14 @@
                 <div class="slds-media__body">
                     <p class="cmp-verdict__text">{verdictText}</p>
                 </div>
-                <lightning-button
-                    label={activateCtaLabel}
-                    variant="brand"
-                    onclick={handleActivate}
-                    class="cmp-verdict__cta">
-                </lightning-button>
+                <template lwc:if={showActivateCta}>
+                    <lightning-button
+                        label={activateCtaLabel}
+                        variant="brand"
+                        onclick={handleActivate}
+                        class="cmp-verdict__cta">
+                    </lightning-button>
+                </template>
             </div>
 
             <section class="cmp-score-section" aria-labelledby="cmp-score-heading">
