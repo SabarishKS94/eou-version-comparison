@@ -43,7 +43,7 @@ function suppressLbcLwcLoggerNoisePlugin() {
 
 export default defineConfig(({mode}) => {
   return {
-    base: mode === 'gh-pages' ? './' : '/',
+    base: mode === 'gh-pages' ? '/eou-version-comparison/' : '/',
     build: {
       outDir: 'dist',
       rollupOptions: {

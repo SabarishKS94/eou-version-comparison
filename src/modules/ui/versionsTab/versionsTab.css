@@ -2,6 +2,13 @@
     padding: 0 1rem 1rem;
 }
 
+/* Prototype: re-enable click on the Compare Versions CTA
+   when the app shell is in presentation-mode (pointer-events: none). */
+.prototype-cta,
+.prototype-cta * {
+    pointer-events: auto;
+}
+
 table {
     width: 100%;
     border-collapse: separate;

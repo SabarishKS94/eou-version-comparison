@@ -103,6 +103,16 @@ export default class App extends LightningElement {
         return this.route?.component === 'page-compare-versions';
     }
 
+    get isPresentationRoute() {
+        return this.route?.path === '/aim-versions';
+    }
+
+    get shellClass() {
+        return this.isPresentationRoute
+            ? 'presentation-mode-wrap presentation-mode'
+            : 'presentation-mode-wrap';
+    }
+
     get isVerticalNav() {
         return this.activeApp?.variant === 'vertical';
     }
@@ -289,9 +299,7 @@ export default class App extends LightningElement {
     }
 
     _promptForApiKeyIfNeeded() {
-        if (!hasApiKey()) {
-            this._openApiKeyModal();
-        }
+        // Disabled for shelf prototype — Agentforce chat is not needed here.
     }
 
     handleNavigateBack() {

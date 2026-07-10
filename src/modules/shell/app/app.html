@@ -9,6 +9,7 @@
             </div>
         </template>
         <template lwc:else>
+            <div class={shellClass}>
             <shell-global-shell
                 current-page={currentNavPage}
                 nav-items={navItems}
@@ -63,6 +64,7 @@
                     </lightning-layout-item>
                 </lightning-layout>
             </main>
+            </div>
         </template>
     </template>
     <template lwc:elseif={isAuthChecked}>

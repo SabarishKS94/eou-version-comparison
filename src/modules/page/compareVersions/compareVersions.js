@@ -3,7 +3,7 @@ import { navigate } from '../../../router';
 
 const VERSION_DATA = {
     v1: {
-        label: 'Version 1', short: 'V1', meta: 'Recommended', score: 87, scoreClass: 'score-card score-card_best',
+        label: 'Version 1', short: 'V1', meta: 'Baseline', score: 87, scoreClass: 'score-card score-card_best',
         quality: { silhouette: 0.62, daviesBouldin: 1.1, interpretability: 'High' },
         structure: { clusters: 3, coverage: '98%', avgSize: '1,200' },
         operational: { trainingSize: '12,400', drift: '0.08' },
@@ -107,12 +107,96 @@ export default class CompareVersions extends LightningElement {
     @track version2Value = 'v2';
     @track version3Value = 'v5';
 
+    @track viewMode = 'simple';
+    @track showDetails = false;
+    @track activeScope = 'factors';
+
     @track showTooltip = false;
     @track tooltipStyle = '';
     @track tooltipVersion = '';
     @track tooltipLabel = '';
     @track tooltipValue = '';
     @track tooltipPct = '';
+
+    get isFullView() { return this.viewMode === 'full'; }
+    get isShortView() { return this.viewMode === 'short'; }
+    get isTwoPaneView() { return this.viewMode === 'twopane'; }
+    get isSimpleView() { return this.viewMode === 'simple'; }
+
+    get contentClass() {
+        return `content-area view-${this.viewMode}`;
+    }
+
+    get showExplainBlock() {
+        if (this.viewMode === 'full') return true;
+        if (this.viewMode === 'twopane') return true;
+        return this.showDetails;
+    }
+
+    get showSelectorsInline() {
+        return this.viewMode === 'full';
+    }
+
+    get toggleDetailsLabel() {
+        return this.showDetails ? 'Hide detailed comparison ↑' : 'Show detailed comparison ↓';
+    }
+
+    get toggleDetailsSimpleLabel() {
+        return this.showDetails ? 'Hide detailed metrics' : 'Show detailed metrics';
+    }
+
+    get toggleDetailsSimpleIcon() {
+        return this.showDetails ? 'utility:chevronup' : 'utility:chevrondown';
+    }
+
+    get detailsSectionClass() {
+        return this.showDetails
+            ? 'slds-section slds-is-open cmp-details-section'
+            : 'slds-section cmp-details-section';
+    }
+
+    get notShowDetails() {
+        return !this.showDetails;
+    }
+
+    get fullViewClass() { return this.isFullView ? 'view-btn view-btn_active' : 'view-btn'; }
+    get shortViewClass() { return this.isShortView ? 'view-btn view-btn_active' : 'view-btn'; }
+    get twoPaneClass() { return this.isTwoPaneView ? 'view-btn view-btn_active' : 'view-btn'; }
+    get simpleViewClass() { return this.isSimpleView ? 'view-btn view-btn_active' : 'view-btn'; }
+
+    get summarySentence() {
+        const versions = this.selectedVersions;
+        const best = versions.reduce((a, b) => a.score > b.score ? a : b);
+        const q = this.qualityTableRows;
+        const s = this.structureTableRows;
+        const o = this.operationalTableRows;
+        const total = q.length + s.length + o.length;
+        const wins = [...q, ...s, ...o].filter(r => {
+            const idx = r.values.findIndex(c => c.cellClass && c.cellClass.includes('slds-text-title_bold'));
+            return idx >= 0 && versions[idx]?.short === best.short;
+        }).length;
+        return `${best.short} wins ${wins} of ${total} metrics — strongest on Quality & confidence.`;
+    }
+
+    get activateCtaLabel() {
+        const versions = this.selectedVersions;
+        const best = versions.reduce((a, b) => a.score > b.score ? a : b);
+        return `Activate ${best.short}`;
+    }
+
+    handleViewFull() { this.viewMode = 'full'; this.showDetails = false; }
+    handleViewShort() { this.viewMode = 'short'; this.showDetails = false; }
+    handleViewTwoPane() { this.viewMode = 'twopane'; this.showDetails = false; }
+    handleViewSimple() { this.viewMode = 'simple'; this.showDetails = false; }
+    handleToggleDetails() { this.showDetails = !this.showDetails; }
+
+    handleScopeChange(event) {
+        this.activeScope = event.target.value;
+    }
+
+    handleActivate() {
+        // no-op prototype
+    }
 
     get activeVersionOptions() {
         return Object.entries(VERSION_DATA).map(([k, v]) => ({ label: v.label, value: k }));
@@ -123,6 +207,12 @@ export default class CompareVersions extends LightningElement {
     }
 
     get selectedVersions() {
+        if (this.viewMode === 'simple') {
+            return [
+                VERSION_DATA[this.version1Value],
+                VERSION_DATA[this.version2Value]
+            ];
+        }
         return [
             VERSION_DATA[this.version1Value],
             VERSION_DATA[this.version2Value],
@@ -137,13 +227,26 @@ export default class CompareVersions extends LightningElement {
         const minScore = Math.min(...scores);
         return versions.map(v => {
             let cardClass = 'score-card score-card_neutral';
-            if (v.score === maxScore) cardClass = 'score-card score-card_best';
-            else if (v.score === minScore && maxScore !== minScore) cardClass = 'score-card score-card_worst';
+            let rowClass = 'twopane-scores__row';
+            let simpleClass = 'cmp-score';
+            const isWinner = v.score === maxScore && maxScore !== minScore;
+            if (v.score === maxScore) {
+                cardClass = 'score-card score-card_best';
+                rowClass = 'twopane-scores__row twopane-scores__row_best';
+                if (isWinner) simpleClass = 'cmp-score cmp-score_best';
+            } else if (v.score === minScore && maxScore !== minScore) {
+                cardClass = 'score-card score-card_worst';
+            }
             return {
                 key: v.short,
                 label: `${v.short} - ${v.meta}`,
+                simpleLabel: `${v.short} - ${v.meta}`,
                 value: v.score,
-                className: cardClass
+                meta: v.meta,
+                isWinner,
+                className: cardClass,
+                rowClass,
+                simpleClass
             };
         });
     }
@@ -191,7 +294,7 @@ export default class CompareVersions extends LightningElement {
                 winner: versions[db.indexOf(bestDb)].short
             },
             {
-                key: 'interp', metric: 'Label interpretability',
+                key: 'interp', metric: 'Label interpretability (↑ better)',
                 values: versions.map((v, i) => this._buildCell(interp[i], i === bestInterpIdx, i === bestInterpIdx, `interp-${v.short}`)),
                 winner: versions[bestInterpIdx].short
             }
@@ -206,21 +309,25 @@ export default class CompareVersions extends LightningElement {
 
         return [
             {
-                key: 'clusters', metric: '# of clusters',
+                key: 'clusters', metric: '# of clusters (context)',
                 values: versions.map(v => this._buildCell(v.structure.clusters.toString(), false, false, `clust-${v.short}`)),
                 winner: '—'
             },
             {
-                key: 'coverage', metric: 'Coverage (% labeled)',
+                key: 'coverage', metric: 'Coverage (% labeled ↑ better)',
                 values: versions.map((v, i) => this._buildCell(v.structure.coverage, i === bestCoverageIdx, i === bestCoverageIdx, `cov-${v.short}`)),
                 winner: versions[bestCoverageIdx].short
             },
             {
-                key: 'avgsize', metric: 'Avg cluster size',
+                key: 'avgsize', metric: 'Avg cluster size (context)',
                 values: versions.map(v => this._buildCell(v.structure.avgSize, false, false, `avg-${v.short}`)),
                 winner: '—'
             }
         ];
+    }
+
+    get combinedTableRows() {
+        return [...this.qualityTableRows, ...this.structureTableRows, ...this.operationalTableRows];
     }
 
     get operationalTableRows() {
@@ -231,12 +338,12 @@ export default class CompareVersions extends LightningElement {
 
         return [
             {
-                key: 'trainsize', metric: 'Training set size',
+                key: 'trainsize', metric: 'Training set size (↑ better)',
                 values: versions.map((v, i) => this._buildCell(v.operational.trainingSize, i === bestTrainIdx, i === bestTrainIdx, `train-${v.short}`)),
                 winner: versions[bestTrainIdx].short
             },
             {
-                key: 'drift', metric: 'Drift vs Active',
+                key: 'drift', metric: 'Drift vs Active (↓ better)',
                 values: versions.map(v => this._buildCell(v.operational.drift, false, false, `drift-${v.short}`)),
                 winner: '—'
             }
@@ -246,11 +353,22 @@ export default class CompareVersions extends LightningElement {
     get tableHeaderVersions() {
         const versions = this.selectedVersions;
         const maxScore = Math.max(...versions.map(v => v.score));
-        return versions.map(v => ({
-            key: v.short,
-            label: v.score === maxScore ? `${v.short} (Recommended)` : `${v.short} (${v.meta})`,
-            isRecommended: v.score === maxScore
-        }));
+        const minScore = Math.min(...versions.map(v => v.score));
+        return versions.map(v => {
+            const isRecommended = v.score === maxScore && maxScore !== minScore;
+            const badgeLabel = isRecommended ? 'Recommended' : v.meta;
+            const badgeClass = isRecommended
+                ? 'slds-badge slds-theme_success cmp-th-badge'
+                : 'slds-badge cmp-th-badge';
+            return {
+                key: v.short,
+                short: v.short,
+                label: `${v.short} (${badgeLabel})`,
+                badgeLabel,
+                badgeClass,
+                isRecommended
+            };
+        });
     }
 
     get labelChartRows() {

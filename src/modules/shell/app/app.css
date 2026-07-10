@@ -8,6 +8,16 @@
     background-color: var(--slds-g-color-surface-2, #f3f3f3);
 }
 
+/* Presentation-mode wrapper — layout-invisible so it doesn't break the shell's flex.
+   Disables interaction on all shell + page content; only the Compare Versions CTA
+   is re-enabled inside versionsTab via .prototype-cta { pointer-events: auto; }. */
+.presentation-mode-wrap {
+    display: contents;
+}
+.presentation-mode {
+    pointer-events: none;
+}
+
 :host > shell-global-shell {
     flex-shrink: 0;
     position: relative;

@@ -8,274 +8,563 @@
             <span>Version Comparison</span>
         </div>
         <div class="builder-header-spacer"></div>
-    </div>
-
-    <!-- Builder Toolbar -->
-    <div class="builder-toolbar">
-        <div class="toolbar-left">
-            <lightning-combobox
-                name="activeVersion"
-                variant="label-hidden"
-                placeholder="Select version"
-                options={activeVersionOptions}
-                value={activeVersionValue}
-                class="toolbar-combobox"
-            ></lightning-combobox>
-            <lightning-button label="Settings" icon-name="utility:settings" variant="neutral"></lightning-button>
-            <span class="toolbar-updated">Last Updated Apr 16 2023, 10:30 AM</span>
-        </div>
-        <div class="toolbar-right">
-            <lightning-button label="Deactivate" variant="neutral"></lightning-button>
+        <div class="builder-header-actions">
+            <div class="view-switcher" role="tablist" aria-label="Layout preview">
+                <button type="button" class={simpleViewClass} onclick={handleViewSimple}>Simple</button>
+                <button type="button" class={twoPaneClass} onclick={handleViewTwoPane}>Two-pane</button>
+                <button type="button" class={shortViewClass} onclick={handleViewShort}>Short view</button>
+                <button type="button" class={fullViewClass} onclick={handleViewFull}>Full</button>
+            </div>
         </div>
     </div>
 
     <!-- Content Area -->
-    <div class="content-area">
-        <!-- Page Header -->
-        <div class="page-header-row">
-            <h1 class="page-title">Version Comparison</h1>
-            <span class="page-meta">Last updated 5 hours ago &middot; evaluated on 24,800 records</span>
-        </div>
-
-        <!-- Version Selector -->
-        <div class="version-selector-section">
-            <span class="selector-label">Select the versions that you want to compare</span>
-            <div class="selector-row">
-                <lightning-combobox
-                    name="version1"
-                    variant="label-hidden"
-                    placeholder="Select version"
-                    options={versionOptions}
-                    value={version1Value}
-                    onchange={handleVersion1Change}
-                    class="version-combobox"
-                ></lightning-combobox>
-                <span class="vs-label">VS</span>
-                <lightning-combobox
-                    name="version2"
-                    variant="label-hidden"
-                    placeholder="Select version"
-                    options={versionOptions}
-                    value={version2Value}
-                    onchange={handleVersion2Change}
-                    class="version-combobox"
-                ></lightning-combobox>
-                <span class="vs-label">VS</span>
-                <lightning-combobox
-                    name="version3"
-                    variant="label-hidden"
-                    placeholder="Select version"
-                    options={versionOptions}
-                    value={version3Value}
-                    onchange={handleVersion3Change}
-                    class="version-combobox"
-                ></lightning-combobox>
+    <div class={contentClass}>
+        <!-- Page Header (hidden in Simple view) -->
+        <template lwc:if={isSimpleView}></template>
+        <template lwc:else>
+            <div class="page-header-row">
+                <h1 class="page-title">Version Comparison</h1>
+                <span class="page-meta">Last updated 5 hours ago &middot; evaluated on 24,800 records</span>
             </div>
-            <div class="selector-divider"></div>
-        </div>
+        </template>
 
-        <!-- Verdict Notification -->
-        <div class="verdict-banner">
-            <lightning-icon icon-name="utility:success" size="x-small" class="verdict-icon"></lightning-icon>
-            <span class="verdict-text">{verdictText}</span>
-        </div>
-
-        <!-- Overall Score -->
-        <div class="score-section">
-            <h2 class="section-title">Overall score</h2>
-            <div class="score-grid">
-                <template for:each={scoreCards} for:item="card">
-                    <div key={card.key} class={card.className}>
-                        <span class="score-card-label">{card.label}</span>
-                        <span class="score-card-value">{card.value}</span>
-                    </div>
-                </template>
-            </div>
-        </div>
-
-        <!-- Detailed Comparison -->
-        <div class="comparison-section">
-            <h2 class="section-title">Detailed comparison</h2>
-
-            <!-- Quality & confidence -->
-            <div class="subsection">
-                <h3 class="subsection-title">Quality &amp; confidence</h3>
-                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" aria-label="Quality and confidence metrics">
-                    <thead>
-                        <tr class="slds-line-height_reset">
-                            <th scope="col"><div class="slds-truncate" title="Metric">Metric</div></th>
-                            <template for:each={tableHeaderVersions} for:item="hdr">
-                                <th key={hdr.key} scope="col" class="slds-text-align_right">
-                                    <div class="slds-truncate" title={hdr.label}>
-                                        {hdr.label}
-                                        <template lwc:if={hdr.isRecommended}>
-                                            <lightning-icon icon-name="utility:success" size="xx-small" class="slds-m-left_xx-small"></lightning-icon>
-                                        </template>
-                                    </div>
-                                </th>
-                            </template>
-                            <th scope="col" class="slds-text-align_right"><div class="slds-truncate" title="Winner">Winner</div></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template for:each={qualityTableRows} for:item="row">
-                            <tr key={row.key}>
-                                <td><div class="slds-truncate">{row.metric}</div></td>
-                                <template for:each={row.values} for:item="cell">
-                                    <td key={cell.key} class={cell.cellClass}>{cell.val}</td>
-                                </template>
-                                <td class="slds-text-align_right">{row.winner}</td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Structure & coverage -->
-            <div class="subsection">
-                <h3 class="subsection-title">Structure &amp; coverage</h3>
-                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" aria-label="Structure and coverage metrics">
-                    <thead>
-                        <tr class="slds-line-height_reset">
-                            <th scope="col"><div class="slds-truncate" title="Metric">Metric</div></th>
-                            <template for:each={tableHeaderVersions} for:item="hdr">
-                                <th key={hdr.key} scope="col" class="slds-text-align_right">
-                                    <div class="slds-truncate" title={hdr.label}>
-                                        {hdr.label}
-                                        <template lwc:if={hdr.isRecommended}>
-                                            <lightning-icon icon-name="utility:success" size="xx-small" class="slds-m-left_xx-small"></lightning-icon>
-                                        </template>
-                                    </div>
-                                </th>
-                            </template>
-                            <th scope="col" class="slds-text-align_right"><div class="slds-truncate" title="Winner">Winner</div></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template for:each={structureTableRows} for:item="row">
-                            <tr key={row.key}>
-                                <td><div class="slds-truncate">{row.metric}</div></td>
-                                <template for:each={row.values} for:item="cell">
-                                    <td key={cell.key} class={cell.cellClass}>{cell.val}</td>
-                                </template>
-                                <td class="slds-text-align_right">{row.winner}</td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Operational -->
-            <div class="subsection">
-                <h3 class="subsection-title">Operational</h3>
-                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered" aria-label="Operational metrics">
-                    <thead>
-                        <tr class="slds-line-height_reset">
-                            <th scope="col"><div class="slds-truncate" title="Metric">Metric</div></th>
-                            <template for:each={tableHeaderVersions} for:item="hdr">
-                                <th key={hdr.key} scope="col" class="slds-text-align_right">
-                                    <div class="slds-truncate" title={hdr.label}>
-                                        {hdr.label}
-                                        <template lwc:if={hdr.isRecommended}>
-                                            <lightning-icon icon-name="utility:success" size="xx-small" class="slds-m-left_xx-small"></lightning-icon>
-                                        </template>
-                                    </div>
-                                </th>
-                            </template>
-                            <th scope="col" class="slds-text-align_right"><div class="slds-truncate" title="Winner">Winner</div></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template for:each={operationalTableRows} for:item="row">
-                            <tr key={row.key}>
-                                <td><div class="slds-truncate">{row.metric}</div></td>
-                                <template for:each={row.values} for:item="cell">
-                                    <td key={cell.key} class={cell.cellClass}>{cell.val}</td>
-                                </template>
-                                <td class="slds-text-align_right">{row.winner}</td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Label Distribution Chart -->
-        <div class="nested-card">
-            <div class="nested-card-header">
-                <span class="nested-card-title">Label distribution across versions</span>
-            </div>
-            <div class="nested-card-body">
-            <div class="chart-legend">
-                <span class="legend-item"><span class="legend-swatch legend-billing"></span>Billing</span>
-                <span class="legend-item"><span class="legend-swatch legend-support"></span>Support</span>
-                <span class="legend-item"><span class="legend-swatch legend-feedback"></span>Feedback</span>
-                <span class="legend-item"><span class="legend-swatch legend-bug"></span>Bug</span>
-                <span class="legend-item"><span class="legend-swatch legend-feature"></span>Feature Request</span>
-                <span class="legend-item"><span class="legend-swatch legend-onboarding"></span>Onboarding</span>
-            </div>
-            <div class="chart-area">
-                <div class="chart-axis">
-                    <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+        <!-- Version Selector (inline in Full view only) -->
+        <template lwc:if={showSelectorsInline}>
+            <div class="version-selector-section">
+                <span class="selector-label">Select the versions that you want to compare</span>
+                <div class="selector-row">
+                    <lightning-combobox name="version1" variant="label-hidden" placeholder="Select version"
+                        options={versionOptions} value={version1Value} onchange={handleVersion1Change}
+                        class="version-combobox"></lightning-combobox>
+                    <span class="vs-label">VS</span>
+                    <lightning-combobox name="version2" variant="label-hidden" placeholder="Select version"
+                        options={versionOptions} value={version2Value} onchange={handleVersion2Change}
+                        class="version-combobox"></lightning-combobox>
+                    <span class="vs-label">VS</span>
+                    <lightning-combobox name="version3" variant="label-hidden" placeholder="Select version"
+                        options={versionOptions} value={version3Value} onchange={handleVersion3Change}
+                        class="version-combobox"></lightning-combobox>
                 </div>
-                <template for:each={labelChartRows} for:item="row">
-                    <div class="chart-row" key={row.version}>
-                        <div class="chart-label">
-                            <span class="chart-version-name">{row.version}</span>
-                            <span class="chart-version-meta">{row.meta}</span>
+                <div class="selector-divider"></div>
+            </div>
+        </template>
+
+        <!-- ============ FULL VIEW ============ -->
+        <template lwc:if={isFullView}>
+            <div class="verdict-banner">
+                <lightning-icon icon-name="utility:success" size="x-small" class="verdict-icon"></lightning-icon>
+                <span class="verdict-text">{verdictText}</span>
+            </div>
+
+            <div class="score-section">
+                <h2 class="section-title">Overall score</h2>
+                <div class="score-grid">
+                    <template for:each={scoreCards} for:item="card">
+                        <div key={card.key} class={card.className}>
+                            <span class="score-card-label">{card.label}</span>
+                            <span class="score-card-value">{card.value}</span>
                         </div>
-                        <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
-                            <template for:each={row.segments} for:item="seg">
-                                <div key={seg.key} class={seg.className} style={seg.style}
-                                     data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
-                                    <span>{seg.text}</span>
+                    </template>
+                </div>
+            </div>
+
+            <div class="nested-card">
+                <div class="nested-card-header">
+                    <span class="nested-card-title">Label distribution across versions</span>
+                    <span class="nested-card-subtitle">What the model predicts — how records fall across output labels for each version.</span>
+                </div>
+                <div class="nested-card-body">
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="legend-swatch legend-billing"></span>Billing</span>
+                        <span class="legend-item"><span class="legend-swatch legend-support"></span>Support</span>
+                        <span class="legend-item"><span class="legend-swatch legend-feedback"></span>Feedback</span>
+                        <span class="legend-item"><span class="legend-swatch legend-bug"></span>Bug</span>
+                        <span class="legend-item"><span class="legend-swatch legend-feature"></span>Feature Request</span>
+                        <span class="legend-item"><span class="legend-swatch legend-onboarding"></span>Onboarding</span>
+                    </div>
+                    <div class="chart-area">
+                        <div class="chart-axis">
+                            <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                        </div>
+                        <template for:each={labelChartRows} for:item="row">
+                            <div class="chart-row" key={row.version}>
+                                <div class="chart-label">
+                                    <span class="chart-version-name">{row.version}</span>
+                                    <span class="chart-version-meta">{row.meta}</span>
+                                </div>
+                                <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
+                                    <template for:each={row.segments} for:item="seg">
+                                        <div key={seg.key} class={seg.className} style={seg.style}
+                                             data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
+                                            <span>{seg.text}</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    <p class="chart-footnote">Each bar = one version, normalized to 100%. Segment width = % of that version's records assigned to the label. Counts shown inside segments are raw record counts.</p>
+                </div>
+            </div>
+
+            <div class="nested-card">
+                <div class="nested-card-header">
+                    <span class="nested-card-title">SHAP distribution across versions</span>
+                    <span class="nested-card-subtitle">What drives the prediction — how much each input variable contributes to cluster formation.</span>
+                </div>
+                <div class="nested-card-body">
+                    <div class="chart-legend">
+                        <span class="legend-item"><span class="legend-swatch legend-shap-1"></span>Products purchases in last month</span>
+                        <span class="legend-item"><span class="legend-swatch legend-shap-2"></span>Total amount spent in last month</span>
+                        <span class="legend-item"><span class="legend-swatch legend-shap-3"></span>Product Review</span>
+                        <span class="legend-item"><span class="legend-swatch legend-shap-4"></span>Customer Care Feedback</span>
+                        <span class="legend-item"><span class="legend-swatch legend-shap-5"></span>Customer Tier</span>
+                    </div>
+                    <div class="chart-area">
+                        <div class="chart-axis">
+                            <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                        </div>
+                        <template for:each={shapChartRows} for:item="row">
+                            <div class="chart-row" key={row.version}>
+                                <div class="chart-label">
+                                    <span class="chart-version-name">{row.version}</span>
+                                    <span class="chart-version-meta">{row.meta}</span>
+                                </div>
+                                <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
+                                    <template for:each={row.segments} for:item="seg">
+                                        <div key={seg.key} class={seg.className} style={seg.style}
+                                             data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
+                                            <span>{seg.text}</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    <p class="chart-footnote">Each bar = one version, normalized to 100%. Segment width = % importance of that predictor in driving cluster formation. Shows how the model's reliance on each variable shifts across versions.</p>
+                </div>
+            </div>
+
+            <div class="comparison-section">
+                <h2 class="section-title">Detailed comparison</h2>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered detailed-table" aria-label="Detailed metric comparison">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col"><div class="slds-truncate" title="Metric">Metric</div></th>
+                            <template for:each={tableHeaderVersions} for:item="hdr">
+                                <th key={hdr.key} scope="col" class="slds-text-align_right">
+                                    <div class="slds-truncate" title={hdr.label}>{hdr.label}
+                                        <template lwc:if={hdr.isRecommended}>
+                                            <lightning-icon icon-name="utility:success" size="xx-small" class="slds-m-left_xx-small"></lightning-icon>
+                                        </template>
+                                    </div>
+                                </th>
+                            </template>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={combinedTableRows} for:item="row">
+                            <tr key={row.key}>
+                                <td><div class="slds-truncate">{row.metric}</div></td>
+                                <template for:each={row.values} for:item="cell">
+                                    <td key={cell.key} class={cell.cellClass}>{cell.val}</td>
+                                </template>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+
+        <!-- ============ SHORT VIEW ============ -->
+        <template lwc:if={isShortView}>
+            <div class="short-decision">
+                <div class="verdict-banner">
+                    <lightning-icon icon-name="utility:success" size="x-small" class="verdict-icon"></lightning-icon>
+                    <span class="verdict-text">{verdictText}</span>
+                </div>
+
+                <div class="score-section">
+                    <h2 class="section-title">Overall score</h2>
+                    <div class="score-grid">
+                        <template for:each={scoreCards} for:item="card">
+                            <div key={card.key} class={card.className}>
+                                <span class="score-card-label">{card.label}</span>
+                                <span class="score-card-value">{card.value}</span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <p class="summary-sentence">{summarySentence}</p>
+
+                <div class="short-actions">
+                    <lightning-button label={activateCtaLabel} variant="brand"></lightning-button>
+                    <button type="button" class="link-btn" onclick={handleToggleDetails}>{toggleDetailsLabel}</button>
+                </div>
+            </div>
+
+            <template lwc:if={showDetails}>
+                <div class="details-drawer">
+                    <div class="nested-card">
+                        <div class="nested-card-header">
+                            <span class="nested-card-title">Label distribution across versions</span>
+                            <span class="nested-card-subtitle">What the model predicts.</span>
+                        </div>
+                        <div class="nested-card-body">
+                            <div class="chart-area">
+                                <div class="chart-axis"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+                                <template for:each={labelChartRows} for:item="row">
+                                    <div class="chart-row" key={row.version}>
+                                        <div class="chart-label"><span class="chart-version-name">{row.version}</span><span class="chart-version-meta">{row.meta}</span></div>
+                                        <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
+                                            <template for:each={row.segments} for:item="seg">
+                                                <div key={seg.key} class={seg.className} style={seg.style}
+                                                     data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
+                                                    <span>{seg.text}</span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nested-card">
+                        <div class="nested-card-header">
+                            <span class="nested-card-title">SHAP distribution across versions</span>
+                            <span class="nested-card-subtitle">What drives the prediction.</span>
+                        </div>
+                        <div class="nested-card-body">
+                            <div class="chart-area">
+                                <div class="chart-axis"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+                                <template for:each={shapChartRows} for:item="row">
+                                    <div class="chart-row" key={row.version}>
+                                        <div class="chart-label"><span class="chart-version-name">{row.version}</span><span class="chart-version-meta">{row.meta}</span></div>
+                                        <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
+                                            <template for:each={row.segments} for:item="seg">
+                                                <div key={seg.key} class={seg.className} style={seg.style}
+                                                     data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
+                                                    <span>{seg.text}</span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-section">
+                        <h2 class="section-title">Detailed comparison</h2>
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered detailed-table">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col"><div class="slds-truncate">Metric</div></th>
+                                    <template for:each={tableHeaderVersions} for:item="hdr">
+                                        <th key={hdr.key} scope="col" class="slds-text-align_right"><div class="slds-truncate">{hdr.label}</div></th>
+                                    </template>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={combinedTableRows} for:item="row">
+                                    <tr key={row.key}>
+                                        <td><div class="slds-truncate">{row.metric}</div></td>
+                                        <template for:each={row.values} for:item="cell">
+                                            <td key={cell.key} class={cell.cellClass}>{cell.val}</td>
+                                        </template>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </template>
+        </template>
+
+        <!-- ============ TWO-PANE VIEW ============ -->
+        <template lwc:if={isTwoPaneView}>
+            <div class="twopane-grid">
+                <aside class="twopane-left">
+                    <article class="slds-card twopane-card">
+                        <div class="slds-card__header twopane-card__header">
+                            <h2 class="slds-card__header-title">
+                                <span class="slds-text-heading_small">Comparison summary</span>
+                            </h2>
+                        </div>
+                        <div class="slds-card__body slds-card__body_inner twopane-card__body">
+                            <div class="twopane-block">
+                                <span class="slds-form-element__label twopane-block__label">Versions</span>
+                                <div class="selector-col selector-col_stacked">
+                                    <lightning-combobox name="version1" variant="label-hidden" options={versionOptions} value={version1Value} onchange={handleVersion1Change}></lightning-combobox>
+                                    <span class="vs-label vs-label_stacked">VS</span>
+                                    <lightning-combobox name="version2" variant="label-hidden" options={versionOptions} value={version2Value} onchange={handleVersion2Change}></lightning-combobox>
+                                    <span class="vs-label vs-label_stacked">VS</span>
+                                    <lightning-combobox name="version3" variant="label-hidden" options={versionOptions} value={version3Value} onchange={handleVersion3Change}></lightning-combobox>
+                                </div>
+                            </div>
+
+                            <div class="twopane-divider" role="separator"></div>
+
+                            <div class="slds-scoped-notification slds-media slds-media_center slds-scoped-notification_dark slds-theme_success" role="status">
+                                <div class="slds-media__figure">
+                                    <lightning-icon icon-name="utility:success" size="small" variant="inverse" alternative-text="Recommendation"></lightning-icon>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{verdictText}</p>
+                                </div>
+                            </div>
+
+                            <div class="twopane-block">
+                                <span class="slds-form-element__label twopane-block__label">Overall score</span>
+                                <ul class="twopane-scores">
+                                    <template for:each={scoreCards} for:item="card">
+                                        <li key={card.key} class={card.rowClass}>
+                                            <span class="twopane-scores__label">{card.label}</span>
+                                            <span class="twopane-scores__value">{card.value}</span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+
+                            <p class="twopane-summary">{summarySentence}</p>
+                        </div>
+                        <footer class="slds-card__footer twopane-card__footer">
+                            <lightning-button label={activateCtaLabel} variant="brand" class="cta-full" stretch></lightning-button>
+                        </footer>
+                    </article>
+                </aside>
+
+                <div class="twopane-right">
+                    <div class="nested-card">
+                        <div class="nested-card-header">
+                            <span class="nested-card-title">Label distribution across versions</span>
+                            <span class="nested-card-subtitle">What the model predicts — how records fall across output labels for each version.</span>
+                        </div>
+                        <div class="nested-card-body">
+                            <div class="chart-area">
+                                <div class="chart-axis"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+                                <template for:each={labelChartRows} for:item="row">
+                                    <div class="chart-row" key={row.version}>
+                                        <div class="chart-label"><span class="chart-version-name">{row.version}</span><span class="chart-version-meta">{row.meta}</span></div>
+                                        <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
+                                            <template for:each={row.segments} for:item="seg">
+                                                <div key={seg.key} class={seg.className} style={seg.style}
+                                                     data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
+                                                    <span>{seg.text}</span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nested-card">
+                        <div class="nested-card-header">
+                            <span class="nested-card-title">SHAP distribution across versions</span>
+                            <span class="nested-card-subtitle">What drives the prediction — how much each input variable contributes to cluster formation.</span>
+                        </div>
+                        <div class="nested-card-body">
+                            <div class="chart-area">
+                                <div class="chart-axis"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+                                <template for:each={shapChartRows} for:item="row">
+                                    <div class="chart-row" key={row.version}>
+                                        <div class="chart-label"><span class="chart-version-name">{row.version}</span><span class="chart-version-meta">{row.meta}</span></div>
+                                        <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
+                                            <template for:each={row.segments} for:item="seg">
+                                                <div key={seg.key} class={seg.className} style={seg.style}
+                                                     data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
+                                                    <span>{seg.text}</span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-section">
+                        <h2 class="section-title">Detailed comparison</h2>
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered detailed-table">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col"><div class="slds-truncate">Metric</div></th>
+                                    <template for:each={tableHeaderVersions} for:item="hdr">
+                                        <th key={hdr.key} scope="col" class="slds-text-align_right"><div class="slds-truncate">{hdr.label}</div></th>
+                                    </template>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={combinedTableRows} for:item="row">
+                                    <tr key={row.key}>
+                                        <td><div class="slds-truncate">{row.metric}</div></td>
+                                        <template for:each={row.values} for:item="cell">
+                                            <td key={cell.key} class={cell.cellClass}>{cell.val}</td>
+                                        </template>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- ============ SIMPLE VIEW (new 4th variant) ============ -->
+        <template lwc:if={isSimpleView}>
+            <section class="cmp-selector" aria-label="Select versions to compare">
+                <div class="cmp-selector__picker">
+                    <span class="slds-form-element__label cmp-selector__label">Version A</span>
+                    <lightning-combobox
+                        name="version1" variant="label-hidden"
+                        options={versionOptions} value={version1Value} onchange={handleVersion1Change}>
+                    </lightning-combobox>
+                </div>
+                <span class="cmp-selector__vs" aria-hidden="true">VS</span>
+                <div class="cmp-selector__picker">
+                    <span class="slds-form-element__label cmp-selector__label">Version B</span>
+                    <lightning-combobox
+                        name="version2" variant="label-hidden"
+                        options={versionOptions} value={version2Value} onchange={handleVersion2Change}>
+                    </lightning-combobox>
+                </div>
+            </section>
+
+            <div class="slds-scoped-notification slds-media slds-media_center slds-theme_success cmp-verdict" role="status">
+                <div class="slds-media__figure">
+                    <lightning-icon icon-name="utility:success" size="small" alternative-text="Recommendation"></lightning-icon>
+                </div>
+                <div class="slds-media__body">
+                    <p class="cmp-verdict__text">{verdictText}</p>
+                </div>
+                <lightning-button
+                    label={activateCtaLabel}
+                    variant="brand"
+                    onclick={handleActivate}
+                    class="cmp-verdict__cta">
+                </lightning-button>
+            </div>
+
+            <section class="cmp-score-section" aria-labelledby="cmp-score-heading">
+                <h2 id="cmp-score-heading" class="cmp-score-section__heading">Overall score</h2>
+                <div class="cmp-score-row">
+                    <template for:each={scoreCards} for:item="card">
+                        <article key={card.key} class={card.simpleClass}>
+                            <span class="cmp-score__label">{card.simpleLabel}</span>
+                            <div class="cmp-score__value">{card.value}</div>
+                        </article>
+                    </template>
+                </div>
+            </section>
+
+            <lightning-tabset active-tab-value={activeScope} onactive={handleScopeChange} class="cmp-scope">
+                <lightning-tab label="Top factors" value="factors">
+                    <div class="cmp-chart-block">
+                        <p class="cmp-chart-block__subtitle">What drives the prediction — how much each input variable contributes to cluster formation.</p>
+                        <div class="chart-legend">
+                            <span class="legend-item"><span class="legend-swatch legend-shap-1"></span>Products purchases</span>
+                            <span class="legend-item"><span class="legend-swatch legend-shap-2"></span>Amount spent</span>
+                            <span class="legend-item"><span class="legend-swatch legend-shap-3"></span>Product Review</span>
+                            <span class="legend-item"><span class="legend-swatch legend-shap-4"></span>Customer Care Feedback</span>
+                            <span class="legend-item"><span class="legend-swatch legend-shap-5"></span>Customer Tier</span>
+                        </div>
+                        <div class="chart-area">
+                            <div class="chart-axis">
+                                <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                            </div>
+                            <template for:each={shapChartRows} for:item="row">
+                                <div class="chart-row" key={row.version}>
+                                    <div class="chart-label">
+                                        <span class="chart-version-name">{row.version}</span>
+                                        <span class="chart-version-meta">{row.meta}</span>
+                                    </div>
+                                    <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
+                                        <template for:each={row.segments} for:item="seg">
+                                            <div key={seg.key} class={seg.className} style={seg.style}
+                                                 data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
+                                                <span>{seg.text}</span>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
                             </template>
                         </div>
                     </div>
-                </template>
-            </div>
-            <p class="chart-footnote">Each bar = one version, normalized to 100%. Segment width = % of that version's records assigned to the label. Counts shown inside segments are raw record counts.</p>
-            </div>
-        </div>
-
-        <!-- SHAP Distribution Chart -->
-        <div class="nested-card">
-            <div class="nested-card-header">
-                <span class="nested-card-title">SHAP distribution across versions</span>
-            </div>
-            <div class="nested-card-body">
-            <div class="chart-legend">
-                <span class="legend-item"><span class="legend-swatch legend-shap-1"></span>Products purchases in last month</span>
-                <span class="legend-item"><span class="legend-swatch legend-shap-2"></span>Total amount spent in last month</span>
-                <span class="legend-item"><span class="legend-swatch legend-shap-3"></span>Product Review</span>
-                <span class="legend-item"><span class="legend-swatch legend-shap-4"></span>Customer Care Feedback</span>
-                <span class="legend-item"><span class="legend-swatch legend-shap-5"></span>Customer Tier</span>
-            </div>
-            <div class="chart-area">
-                <div class="chart-axis">
-                    <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
-                </div>
-                <template for:each={shapChartRows} for:item="row">
-                    <div class="chart-row" key={row.version}>
-                        <div class="chart-label">
-                            <span class="chart-version-name">{row.version}</span>
-                            <span class="chart-version-meta">{row.meta}</span>
+                </lightning-tab>
+                <lightning-tab label="Prediction buckets" value="buckets">
+                    <div class="cmp-chart-block">
+                        <p class="cmp-chart-block__subtitle">What the model predicts — how records fall across output labels for each version.</p>
+                        <div class="chart-legend">
+                            <span class="legend-item"><span class="legend-swatch legend-billing"></span>Billing</span>
+                            <span class="legend-item"><span class="legend-swatch legend-support"></span>Support</span>
+                            <span class="legend-item"><span class="legend-swatch legend-feedback"></span>Feedback</span>
+                            <span class="legend-item"><span class="legend-swatch legend-bug"></span>Bug</span>
+                            <span class="legend-item"><span class="legend-swatch legend-feature"></span>Feature Request</span>
+                            <span class="legend-item"><span class="legend-swatch legend-onboarding"></span>Onboarding</span>
                         </div>
-                        <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
-                            <template for:each={row.segments} for:item="seg">
-                                <div key={seg.key} class={seg.className} style={seg.style}
-                                     data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
-                                    <span>{seg.text}</span>
+                        <div class="chart-area">
+                            <div class="chart-axis">
+                                <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
+                            </div>
+                            <template for:each={labelChartRows} for:item="row">
+                                <div class="chart-row" key={row.version}>
+                                    <div class="chart-label">
+                                        <span class="chart-version-name">{row.version}</span>
+                                        <span class="chart-version-meta">{row.meta}</span>
+                                    </div>
+                                    <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
+                                        <template for:each={row.segments} for:item="seg">
+                                            <div key={seg.key} class={seg.className} style={seg.style}
+                                                 data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
+                                                <span>{seg.text}</span>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
                             </template>
                         </div>
                     </div>
+                </lightning-tab>
+            </lightning-tabset>
+
+            <div class={detailsSectionClass}>
+                <button type="button" class="cmp-details-toggle" onclick={handleToggleDetails} aria-expanded={showDetails} aria-controls="cmp-details-content">
+                    <lightning-icon icon-name="utility:chevronright" size="x-small" class="cmp-details-toggle__chevron"></lightning-icon>
+                    <span class="cmp-details-toggle__label">{toggleDetailsSimpleLabel}</span>
+                </button>
+                <template lwc:if={showDetails}>
+                    <div class="cmp-details-content" id="cmp-details-content">
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered detailed-table" aria-label="Detailed metric comparison">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col"><div class="slds-truncate" title="Metric">Metric</div></th>
+                                    <template for:each={tableHeaderVersions} for:item="hdr">
+                                        <th key={hdr.key} scope="col" class="slds-text-align_right">
+                                            <div class="slds-truncate" title={hdr.label}>{hdr.label}</div>
+                                        </th>
+                                    </template>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={combinedTableRows} for:item="row">
+                                    <tr key={row.key}>
+                                        <td><div class="slds-truncate">{row.metric}</div></td>
+                                        <template for:each={row.values} for:item="cell">
+                                            <td key={cell.key} class={cell.cellClass}>{cell.val}</td>
+                                        </template>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
                 </template>
             </div>
-            <p class="chart-footnote">Each bar = one version, normalized to 100%. Segment width = % importance of that predictor in driving cluster formation. Shows how the model's reliance on each variable shifts across versions.</p>
-            </div>
-        </div>
+        </template>
 
         <!-- Chart Tooltip -->
         <template lwc:if={showTooltip}>
