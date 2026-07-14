@@ -146,6 +146,23 @@
 .twopane-grid_right {
     grid-template-columns: 1fr 320px;
 }
+
+/* Enhanced view: versions (L), charts (center), recommendation (R) */
+.enh-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    gap: 1.5rem;
+    align-items: start;
+}
+.enh-left,
+.enh-right {
+    position: sticky;
+    top: 0;
+    align-self: start;
+}
+.enh-main {
+    min-width: 0;
+}
 .twopane-left {
     position: sticky;
     top: 0;

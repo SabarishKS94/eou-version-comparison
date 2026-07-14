@@ -416,10 +416,32 @@
             </div>
         </template>
 
-        <!-- ============ ENHANCED VIEW (summary on right, details behind toggle) ============ -->
+        <!-- ============ ENHANCED VIEW (versions on left, recommendation on right) ============ -->
         <template lwc:if={isEnhancedView}>
-            <div class="twopane-grid twopane-grid_right">
-                <div class="twopane-right">
+            <div class="enh-grid">
+                <aside class="enh-left">
+                    <article class="slds-card twopane-card">
+                        <div class="slds-card__header twopane-card__header">
+                            <h2 class="slds-card__header-title">
+                                <span class="slds-text-heading_small">Comparison summary</span>
+                            </h2>
+                        </div>
+                        <div class="slds-card__body slds-card__body_inner twopane-card__body">
+                            <div class="twopane-block">
+                                <span class="slds-form-element__label twopane-block__label">Versions</span>
+                                <div class="selector-col selector-col_stacked">
+                                    <lightning-combobox name="version1" variant="label-hidden" options={versionOptions} value={version1Value} onchange={handleVersion1Change}></lightning-combobox>
+                                    <span class="vs-label vs-label_stacked">VS</span>
+                                    <lightning-combobox name="version2" variant="label-hidden" options={versionOptions} value={version2Value} onchange={handleVersion2Change}></lightning-combobox>
+                                    <span class="vs-label vs-label_stacked">VS</span>
+                                    <lightning-combobox name="version3" variant="label-hidden" options={versionOptions} value={version3Value} onchange={handleVersion3Change}></lightning-combobox>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </aside>
+
+                <div class="enh-main">
                     <div class="nested-card">
                         <div class="nested-card-header">
                             <span class="nested-card-title">Label distribution across versions</span>
@@ -504,27 +526,14 @@
                     </div>
                 </div>
 
-                <aside class="twopane-left">
+                <aside class="enh-right">
                     <article class="slds-card twopane-card">
                         <div class="slds-card__header twopane-card__header">
                             <h2 class="slds-card__header-title">
-                                <span class="slds-text-heading_small">Comparison summary</span>
+                                <span class="slds-text-heading_small">Recommendation</span>
                             </h2>
                         </div>
                         <div class="slds-card__body slds-card__body_inner twopane-card__body">
-                            <div class="twopane-block">
-                                <span class="slds-form-element__label twopane-block__label">Versions</span>
-                                <div class="selector-col selector-col_stacked">
-                                    <lightning-combobox name="version1" variant="label-hidden" options={versionOptions} value={version1Value} onchange={handleVersion1Change}></lightning-combobox>
-                                    <span class="vs-label vs-label_stacked">VS</span>
-                                    <lightning-combobox name="version2" variant="label-hidden" options={versionOptions} value={version2Value} onchange={handleVersion2Change}></lightning-combobox>
-                                    <span class="vs-label vs-label_stacked">VS</span>
-                                    <lightning-combobox name="version3" variant="label-hidden" options={versionOptions} value={version3Value} onchange={handleVersion3Change}></lightning-combobox>
-                                </div>
-                            </div>
-
-                            <div class="twopane-divider" role="separator"></div>
-
                             <div class="slds-scoped-notification slds-media slds-media_center slds-scoped-notification_dark slds-theme_success" role="status">
                                 <div class="slds-media__figure">
                                     <lightning-icon icon-name="utility:success" size="small" variant="inverse" alternative-text="Recommendation"></lightning-icon>
