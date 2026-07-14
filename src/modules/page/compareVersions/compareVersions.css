@@ -844,10 +844,6 @@ table.slds-table th:nth-child(4) { width: 22%; }
     gap: 1rem;
 }
 .cmp-score {
-    background: #fff;
-    border: 1px solid var(--slds-g-color-border-1, #d9dee5);
-    border-radius: 0.5rem;
-    padding: 1rem 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

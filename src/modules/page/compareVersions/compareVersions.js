@@ -231,12 +231,12 @@ export default class CompareVersions extends LightningElement {
         return versions.map(v => {
             let cardClass = 'score-card score-card_neutral';
             let rowClass = 'twopane-scores__row';
-            let simpleClass = 'cmp-score';
+            let simpleClass = 'slds-box cmp-score';
             const isWinner = v.score === maxScore && maxScore !== minScore;
             if (v.score === maxScore) {
                 cardClass = 'score-card score-card_best';
                 rowClass = 'twopane-scores__row twopane-scores__row_best';
-                if (isWinner) simpleClass = 'cmp-score cmp-score_best';
+                if (isWinner) simpleClass = 'slds-box cmp-score cmp-score_best';
             } else if (v.score === minScore && maxScore !== minScore) {
                 cardClass = 'score-card score-card_worst';
             }
