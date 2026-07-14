@@ -122,6 +122,7 @@ export default class CompareVersions extends LightningElement {
     get isShortView() { return this.viewMode === 'short'; }
     get isTwoPaneView() { return this.viewMode === 'twopane'; }
     get isSimpleView() { return this.viewMode === 'simple'; }
+    get isEnhancedView() { return this.viewMode === 'enhanced'; }
 
     get contentClass() {
         return `content-area view-${this.viewMode}`;
@@ -163,6 +164,7 @@ export default class CompareVersions extends LightningElement {
     get shortViewClass() { return this.isShortView ? 'view-btn view-btn_active' : 'view-btn'; }
     get twoPaneClass() { return this.isTwoPaneView ? 'view-btn view-btn_active' : 'view-btn'; }
     get simpleViewClass() { return this.isSimpleView ? 'view-btn view-btn_active' : 'view-btn'; }
+    get enhancedViewClass() { return this.isEnhancedView ? 'view-btn view-btn_active' : 'view-btn'; }
 
     get summarySentence() {
         const versions = this.selectedVersions;
@@ -188,6 +190,7 @@ export default class CompareVersions extends LightningElement {
     handleViewShort() { this.viewMode = 'short'; this.showDetails = false; }
     handleViewTwoPane() { this.viewMode = 'twopane'; this.showDetails = false; }
     handleViewSimple() { this.viewMode = 'simple'; this.showDetails = false; }
+    handleViewEnhanced() { this.viewMode = 'enhanced'; this.showDetails = false; }
     handleToggleDetails() { this.showDetails = !this.showDetails; }
 
     handleScopeChange(event) {

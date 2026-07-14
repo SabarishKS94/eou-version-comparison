@@ -143,6 +143,9 @@
     gap: 1.5rem;
     align-items: start;
 }
+.twopane-grid_right {
+    grid-template-columns: 1fr 320px;
+}
 .twopane-left {
     position: sticky;
     top: 0;

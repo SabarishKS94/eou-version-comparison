@@ -11,6 +11,7 @@
         <div class="builder-header-actions">
             <div class="view-switcher" role="tablist" aria-label="Layout preview">
                 <button type="button" class={simpleViewClass} onclick={handleViewSimple}>Simple</button>
+                <button type="button" class={enhancedViewClass} onclick={handleViewEnhanced}>Enhanced</button>
                 <button type="button" class={twoPaneClass} onclick={handleViewTwoPane}>Two-pane</button>
                 <button type="button" class={shortViewClass} onclick={handleViewShort}>Short view</button>
                 <button type="button" class={fullViewClass} onclick={handleViewFull}>Full</button>
@@ -412,6 +413,148 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </template>
+
+        <!-- ============ ENHANCED VIEW (summary on right, details behind toggle) ============ -->
+        <template lwc:if={isEnhancedView}>
+            <div class="twopane-grid twopane-grid_right">
+                <div class="twopane-right">
+                    <div class="nested-card">
+                        <div class="nested-card-header">
+                            <span class="nested-card-title">Label distribution across versions</span>
+                            <span class="nested-card-subtitle">What the model predicts — how records fall across output labels for each version.</span>
+                        </div>
+                        <div class="nested-card-body">
+                            <div class="chart-area">
+                                <div class="chart-axis"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+                                <template for:each={labelChartRows} for:item="row">
+                                    <div class="chart-row" key={row.version}>
+                                        <div class="chart-label"><span class="chart-version-name">{row.version}</span><span class="chart-version-meta">{row.meta}</span></div>
+                                        <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
+                                            <template for:each={row.segments} for:item="seg">
+                                                <div key={seg.key} class={seg.className} style={seg.style}
+                                                     data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
+                                                    <span>{seg.text}</span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nested-card">
+                        <div class="nested-card-header">
+                            <span class="nested-card-title">SHAP distribution across versions</span>
+                            <span class="nested-card-subtitle">What drives the prediction — how much each input variable contributes to cluster formation.</span>
+                        </div>
+                        <div class="nested-card-body">
+                            <div class="chart-area">
+                                <div class="chart-axis"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+                                <template for:each={shapChartRows} for:item="row">
+                                    <div class="chart-row" key={row.version}>
+                                        <div class="chart-label"><span class="chart-version-name">{row.version}</span><span class="chart-version-meta">{row.meta}</span></div>
+                                        <div class="chart-bar" onmouseover={handleSegmentHover} onmouseout={handleSegmentLeave}>
+                                            <template for:each={row.segments} for:item="seg">
+                                                <div key={seg.key} class={seg.className} style={seg.style}
+                                                     data-label={seg.label} data-value={seg.value} data-pct={seg.pct} data-version={row.version}>
+                                                    <span>{seg.text}</span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class={detailsSectionClass}>
+                        <button type="button" class="cmp-details-toggle" onclick={handleToggleDetails} aria-expanded={showDetails} aria-controls="enh-details-content">
+                            <lightning-icon icon-name="utility:chevronright" size="x-small" class="cmp-details-toggle__chevron"></lightning-icon>
+                            <span class="cmp-details-toggle__label">{toggleDetailsSimpleLabel}</span>
+                        </button>
+                        <template lwc:if={showDetails}>
+                            <div class="cmp-details-content" id="enh-details-content">
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered detailed-table" aria-label="Detailed metric comparison">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th scope="col"><div class="slds-truncate" title="Metric">Metric</div></th>
+                                            <template for:each={tableHeaderVersions} for:item="hdr">
+                                                <th key={hdr.key} scope="col" class="slds-text-align_right">
+                                                    <div class="slds-truncate" title={hdr.label}>{hdr.label}</div>
+                                                </th>
+                                            </template>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={combinedTableRows} for:item="row">
+                                            <tr key={row.key}>
+                                                <td><div class="slds-truncate">{row.metric}</div></td>
+                                                <template for:each={row.values} for:item="cell">
+                                                    <td key={cell.key} class={cell.cellClass}>{cell.val}</td>
+                                                </template>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <aside class="twopane-left">
+                    <article class="slds-card twopane-card">
+                        <div class="slds-card__header twopane-card__header">
+                            <h2 class="slds-card__header-title">
+                                <span class="slds-text-heading_small">Comparison summary</span>
+                            </h2>
+                        </div>
+                        <div class="slds-card__body slds-card__body_inner twopane-card__body">
+                            <div class="twopane-block">
+                                <span class="slds-form-element__label twopane-block__label">Versions</span>
+                                <div class="selector-col selector-col_stacked">
+                                    <lightning-combobox name="version1" variant="label-hidden" options={versionOptions} value={version1Value} onchange={handleVersion1Change}></lightning-combobox>
+                                    <span class="vs-label vs-label_stacked">VS</span>
+                                    <lightning-combobox name="version2" variant="label-hidden" options={versionOptions} value={version2Value} onchange={handleVersion2Change}></lightning-combobox>
+                                    <span class="vs-label vs-label_stacked">VS</span>
+                                    <lightning-combobox name="version3" variant="label-hidden" options={versionOptions} value={version3Value} onchange={handleVersion3Change}></lightning-combobox>
+                                </div>
+                            </div>
+
+                            <div class="twopane-divider" role="separator"></div>
+
+                            <div class="slds-scoped-notification slds-media slds-media_center slds-scoped-notification_dark slds-theme_success" role="status">
+                                <div class="slds-media__figure">
+                                    <lightning-icon icon-name="utility:success" size="small" variant="inverse" alternative-text="Recommendation"></lightning-icon>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{verdictText}</p>
+                                </div>
+                            </div>
+
+                            <div class="twopane-block">
+                                <span class="slds-form-element__label twopane-block__label">Overall score</span>
+                                <ul class="twopane-scores">
+                                    <template for:each={scoreCards} for:item="card">
+                                        <li key={card.key} class={card.rowClass}>
+                                            <span class="twopane-scores__label">{card.label}</span>
+                                            <span class="twopane-scores__value">{card.value}</span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+
+                            <p class="twopane-summary">{summarySentence}</p>
+                        </div>
+                        <template lwc:if={showActivateCta}>
+                            <footer class="slds-card__footer twopane-card__footer">
+                                <lightning-button label={activateCtaLabel} variant="brand" class="cta-full" stretch></lightning-button>
+                            </footer>
+                        </template>
+                    </article>
+                </aside>
             </div>
         </template>
 
