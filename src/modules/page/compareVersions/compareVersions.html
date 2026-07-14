@@ -443,40 +443,38 @@
 
                 <div class="enh-main">
                     <article class="slds-card twopane-card enh-recommendation">
-                        <div class="slds-card__header twopane-card__header">
+                        <div class="slds-card__header twopane-card__header enh-recommendation__header">
                             <h2 class="slds-card__header-title">
                                 <span class="slds-text-heading_small">Recommendation</span>
                             </h2>
+                            <template lwc:if={showActivateCta}>
+                                <lightning-button label={activateCtaLabel} variant="brand" class="enh-recommendation__cta"></lightning-button>
+                            </template>
                         </div>
                         <div class="slds-card__body slds-card__body_inner twopane-card__body">
-                            <div class="slds-scoped-notification slds-media slds-media_center slds-scoped-notification_dark slds-theme_success" role="status">
+                            <div class="slds-scoped-notification slds-media slds-media_center slds-theme_success cmp-verdict" role="status">
                                 <div class="slds-media__figure">
-                                    <lightning-icon icon-name="utility:success" size="small" variant="inverse" alternative-text="Recommendation"></lightning-icon>
+                                    <lightning-icon icon-name="utility:success" size="small" alternative-text="Recommendation"></lightning-icon>
                                 </div>
                                 <div class="slds-media__body">
-                                    <p>{verdictText}</p>
+                                    <p class="cmp-verdict__text">{verdictText}</p>
                                 </div>
                             </div>
 
-                            <div class="twopane-block">
-                                <span class="slds-form-element__label twopane-block__label">Overall score</span>
-                                <ul class="twopane-scores enh-scores-row">
+                            <section class="cmp-score-section enh-score-section" aria-label="Overall score">
+                                <h3 class="cmp-score-section__heading">Overall score</h3>
+                                <div class="cmp-score-row enh-score-row">
                                     <template for:each={scoreCards} for:item="card">
-                                        <li key={card.key} class={card.rowClass}>
-                                            <span class="twopane-scores__label">{card.label}</span>
-                                            <span class="twopane-scores__value">{card.value}</span>
-                                        </li>
+                                        <article key={card.key} class={card.simpleClass}>
+                                            <span class="cmp-score__label">{card.simpleLabel}</span>
+                                            <div class="cmp-score__value">{card.value}</div>
+                                        </article>
                                     </template>
-                                </ul>
-                            </div>
+                                </div>
+                            </section>
 
                             <p class="twopane-summary">{summarySentence}</p>
                         </div>
-                        <template lwc:if={showActivateCta}>
-                            <footer class="slds-card__footer twopane-card__footer enh-recommendation__footer">
-                                <lightning-button label={activateCtaLabel} variant="brand"></lightning-button>
-                            </footer>
-                        </template>
                     </article>
 
                     <div class="nested-card">

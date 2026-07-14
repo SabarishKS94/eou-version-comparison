@@ -165,9 +165,23 @@
     flex-direction: column;
     gap: 1rem;
 }
-.enh-recommendation__footer {
+.enh-recommendation__header {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.enh-recommendation__cta {
+    flex-shrink: 0;
+}
+.enh-score-section {
+    gap: 0.5rem;
+}
+.enh-score-section .cmp-score-section__heading {
+    font-size: 0.875rem;
+}
+.enh-score-row {
+    grid-template-columns: repeat(3, 1fr);
 }
 .twopane-left {
     position: sticky;
