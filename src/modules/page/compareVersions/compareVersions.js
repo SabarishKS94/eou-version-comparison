@@ -210,7 +210,7 @@ export default class CompareVersions extends LightningElement {
     }
 
     get selectedVersions() {
-        if (this.viewMode === 'simple') {
+        if (this.viewMode === 'simple' || this.viewMode === 'enhanced') {
             return [
                 VERSION_DATA[this.version1Value],
                 VERSION_DATA[this.version2Value]
