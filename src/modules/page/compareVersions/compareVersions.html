@@ -442,6 +442,43 @@
                 </aside>
 
                 <div class="enh-main">
+                    <article class="slds-card twopane-card enh-recommendation">
+                        <div class="slds-card__header twopane-card__header">
+                            <h2 class="slds-card__header-title">
+                                <span class="slds-text-heading_small">Recommendation</span>
+                            </h2>
+                        </div>
+                        <div class="slds-card__body slds-card__body_inner twopane-card__body">
+                            <div class="slds-scoped-notification slds-media slds-media_center slds-scoped-notification_dark slds-theme_success" role="status">
+                                <div class="slds-media__figure">
+                                    <lightning-icon icon-name="utility:success" size="small" variant="inverse" alternative-text="Recommendation"></lightning-icon>
+                                </div>
+                                <div class="slds-media__body">
+                                    <p>{verdictText}</p>
+                                </div>
+                            </div>
+
+                            <div class="twopane-block">
+                                <span class="slds-form-element__label twopane-block__label">Overall score</span>
+                                <ul class="twopane-scores enh-scores-row">
+                                    <template for:each={scoreCards} for:item="card">
+                                        <li key={card.key} class={card.rowClass}>
+                                            <span class="twopane-scores__label">{card.label}</span>
+                                            <span class="twopane-scores__value">{card.value}</span>
+                                        </li>
+                                    </template>
+                                </ul>
+                            </div>
+
+                            <p class="twopane-summary">{summarySentence}</p>
+                        </div>
+                        <template lwc:if={showActivateCta}>
+                            <footer class="slds-card__footer twopane-card__footer enh-recommendation__footer">
+                                <lightning-button label={activateCtaLabel} variant="brand"></lightning-button>
+                            </footer>
+                        </template>
+                    </article>
+
                     <div class="nested-card">
                         <div class="nested-card-header">
                             <span class="nested-card-title">Label distribution across versions</span>
@@ -526,44 +563,6 @@
                     </div>
                 </div>
 
-                <aside class="enh-right">
-                    <article class="slds-card twopane-card">
-                        <div class="slds-card__header twopane-card__header">
-                            <h2 class="slds-card__header-title">
-                                <span class="slds-text-heading_small">Recommendation</span>
-                            </h2>
-                        </div>
-                        <div class="slds-card__body slds-card__body_inner twopane-card__body">
-                            <div class="slds-scoped-notification slds-media slds-media_center slds-scoped-notification_dark slds-theme_success" role="status">
-                                <div class="slds-media__figure">
-                                    <lightning-icon icon-name="utility:success" size="small" variant="inverse" alternative-text="Recommendation"></lightning-icon>
-                                </div>
-                                <div class="slds-media__body">
-                                    <p>{verdictText}</p>
-                                </div>
-                            </div>
-
-                            <div class="twopane-block">
-                                <span class="slds-form-element__label twopane-block__label">Overall score</span>
-                                <ul class="twopane-scores">
-                                    <template for:each={scoreCards} for:item="card">
-                                        <li key={card.key} class={card.rowClass}>
-                                            <span class="twopane-scores__label">{card.label}</span>
-                                            <span class="twopane-scores__value">{card.value}</span>
-                                        </li>
-                                    </template>
-                                </ul>
-                            </div>
-
-                            <p class="twopane-summary">{summarySentence}</p>
-                        </div>
-                        <template lwc:if={showActivateCta}>
-                            <footer class="slds-card__footer twopane-card__footer">
-                                <lightning-button label={activateCtaLabel} variant="brand" class="cta-full" stretch></lightning-button>
-                            </footer>
-                        </template>
-                    </article>
-                </aside>
             </div>
         </template>
 
