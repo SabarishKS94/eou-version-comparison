@@ -173,6 +173,7 @@
 }
 .enh-recommendation__cta {
     flex-shrink: 0;
+    margin-left: auto;
 }
 .enh-score-section {
     gap: 0.5rem;
@@ -180,7 +181,7 @@
 .enh-score-section .cmp-score-section__heading {
     font-size: 0.875rem;
 }
-.enh-score-row {
+.cmp-score-row.enh-score-row {
     grid-template-columns: repeat(3, 1fr);
 }
 .twopane-left {
